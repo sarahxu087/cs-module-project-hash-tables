@@ -22,7 +22,8 @@ class HashTable:
 
     def __init__(self, capacity):
         # Your code here
-
+        self.capacity = capacity
+        self.array = [None]* self.capacity
 
     def get_num_slots(self):
         """
@@ -35,7 +36,10 @@ class HashTable:
         Implement this.
         """
         # Your code here
-
+        hash_table = self.array
+        return len(hash_table)
+        
+    
 
     def get_load_factor(self):
         """
@@ -44,6 +48,7 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        return self.array
 
 
     def fnv1(self, key):
@@ -63,6 +68,11 @@ class HashTable:
         Implement this, and/or FNV-1.
         """
         # Your code here
+        total = 0
+        for char in key:
+            total += ord(char)
+        return total
+
 
 
     def hash_index(self, key):
@@ -82,6 +92,9 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        slot = self.hash_index(key)
+        data = self.get_load_factor()
+        data[slot] = HashTableEntry(key, value)
 
 
     def delete(self, key):
@@ -93,7 +106,7 @@ class HashTable:
         Implement this.
         """
         # Your code here
-
+        self.put(key,None)
 
     def get(self, key):
         """
@@ -104,7 +117,12 @@ class HashTable:
         Implement this.
         """
         # Your code here
-
+        slot = self.hash_index(key)
+        data = self.get_load_factor()
+        hash_entry = data[slot]
+        if hash_entry is not None:
+            return hash_entry.value
+        return None
 
     def resize(self, new_capacity):
         """
@@ -114,11 +132,11 @@ class HashTable:
         Implement this.
         """
         # Your code here
-
+        
 
 
 if __name__ == "__main__":
-    ht = HashTable(8)
+ '''   ht = HashTable(8)
 
     ht.put("line_1", "'Twas brillig, and the slithy toves")
     ht.put("line_2", "Did gyre and gimble in the wabe:")
@@ -136,8 +154,8 @@ if __name__ == "__main__":
     print("")
 
     # Test storing beyond capacity
-    for i in range(1, 13):
-        print(ht.get(f"line_{i}"))
+    #for i in range(1, 13):
+        #print(ht.get(f"line_{i}"))
 
     # Test resizing
     old_capacity = ht.get_num_slots()
@@ -151,3 +169,4 @@ if __name__ == "__main__":
         print(ht.get(f"line_{i}"))
 
     print("")
+'''
