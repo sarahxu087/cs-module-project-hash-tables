@@ -67,10 +67,10 @@ class HashTable:
         Implement this, and/or FNV-1.
         """
         # Your code here
-        total = 0
-        for char in key:
-            total += ord(char)
-        return total
+        hash = 5381
+        for c in key:
+            hash = (hash * 33) + ord(c)
+        return hash
 
 
 
@@ -93,26 +93,19 @@ class HashTable:
         # Your code here
         slot = self.hash_index(key)
         hash_entry=HashTableEntry(key,value)
-        node = self.array[slot]
-        if node is None:
-            node = hash_entry
-            self.size +=1
+        cur = self.array[slot]
+        last = None
+        while cur is not None and cur.key != key:
+            last = cur
+            cur = last.next
 
+        if cur is not None:
+            cur.value = value
         else:
-            cur = node
-            if cur is not None and cur.next is None:
-                if cur.key == key:
-                    cur.value = value
-                else:
-                    cur.next =hash_entry
-            if cur.next is not None:
-                while cur.next is not None:
-                    if cur.key ==key:
-                        cur.value = value
-                    else:
-                        cur = cur.next
-            return
-        
+            new = hash_entry
+            new.next = self.array[slot]
+            self.array[slot] = new
+            self.size += 1
         if self.get_load_factor() > 0.7:
             self.resize(self.capacity * 2)
 
@@ -127,25 +120,21 @@ class HashTable:
         """
         # Your code here
         slot = self.hash_index(key)
-        node = self.array[slot]
-        prev = None
-        cur = node
-        key_found=False
-        while cur is not None:
-            if cur.key == key:
-                key_found=True
-                if prev is not None:
-                    prev.next = current.next
-                else:
-                    head =current.next
-            else:
-                prev = cur
-                cur = cur.next
-        if not key_found:
-            print('Key {} not found'.format(key))
-        else:
-            print('Key {} deleted'.format(key))
+        cur = self.array[slot]
+        last = None
 
+        while cur is not None and cur.key != key:
+            last = cur
+            cur = last.next
+            
+        if cur is None:
+            print("ERROR: Unable to remove key " + key)
+        else:
+            if last is None:  
+                self.array[slot] = cur.next
+            else:
+                last.next = cur.next
+            self.size-=1
 
     def get(self, key):
         """
@@ -157,15 +146,11 @@ class HashTable:
         """
         # Your code here
         slot = self.hash_index(key)
-        hash_entry = self.array[slot]
-        cur = hash_entry
-        if cur: 
-            while cur.next != None:
-                if cur.key == key:
-                    return cur.value
-                else:
-                    cur = cur.next
-            return cur.value
+        cur = self.array[slot]
+        while cur is not None:
+            if(cur.key == key):
+                return cur.value
+            cur = cur.next
         return None 
 
 
@@ -178,13 +163,16 @@ class HashTable:
         Implement this.
         """
         # Your code here
+
         new = HashTable(new_capacity)
-        for i in self.array:
-            while i is not None:
-                new.put(key,value)
-                i = i.next
-        self.capacity = new.capacity
-        self.array = new.array
+        cur = None
+        for i in range(len(self.array)):
+            cur = self.array[i]
+            while cur is not None:
+                new.put(cur.key,cur.value)
+                cur = cur.next
+
+        return new
         
 
 '''
