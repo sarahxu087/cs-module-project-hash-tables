@@ -24,7 +24,7 @@ class HashTable:
         # Your code here
         self.capacity = capacity
         self.array = [None]* self.capacity
-
+        self.size = 0
     def get_num_slots(self):
         """
         Return the length of the list you're using to hold the hash
@@ -36,8 +36,7 @@ class HashTable:
         Implement this.
         """
         # Your code here
-        hash_table = self.array
-        return len(hash_table)
+        return self.capacity
         
     
 
@@ -48,7 +47,7 @@ class HashTable:
         Implement this.
         """
         # Your code here
-        return self.array
+        return self.size/self.capacity
 
 
     def fnv1(self, key):
@@ -93,8 +92,29 @@ class HashTable:
         """
         # Your code here
         slot = self.hash_index(key)
-        data = self.get_load_factor()
-        data[slot] = HashTableEntry(key, value)
+        hash_entry=HashTableEntry(key,value)
+        node = self.array[slot]
+        if node is None:
+            node = hash_entry
+            self.size +=1
+
+        else:
+            cur = node
+            if cur is not None and cur.next is None:
+                if cur.key == key:
+                    cur.value = value
+                else:
+                    cur.next =hash_entry
+            if cur.next is not None:
+                while cur.next is not None:
+                    if cur.key ==key:
+                        cur.value = value
+                    else:
+                        cur = cur.next
+            return
+        
+        if self.get_load_factor() > 0.7:
+            self.resize(self.capacity * 2)
 
 
     def delete(self, key):
@@ -106,7 +126,26 @@ class HashTable:
         Implement this.
         """
         # Your code here
-        self.put(key,None)
+        slot = self.hash_index(key)
+        node = self.array[slot]
+        prev = None
+        cur = node
+        key_found=False
+        while cur is not None:
+            if cur.key == key:
+                key_found=True
+                if prev is not None:
+                    prev.next = current.next
+                else:
+                    head =current.next
+            else:
+                prev = cur
+                cur = cur.next
+        if not key_found:
+            print('Key {} not found'.format(key))
+        else:
+            print('Key {} deleted'.format(key))
+
 
     def get(self, key):
         """
@@ -118,11 +157,18 @@ class HashTable:
         """
         # Your code here
         slot = self.hash_index(key)
-        data = self.get_load_factor()
-        hash_entry = data[slot]
-        if hash_entry is not None:
-            return hash_entry.value
-        return None
+        hash_entry = self.array[slot]
+        cur = hash_entry
+        if cur: 
+            while cur.next != None:
+                if cur.key == key:
+                    return cur.value
+                else:
+                    cur = cur.next
+            return cur.value
+        return None 
+
+
 
     def resize(self, new_capacity):
         """
@@ -132,32 +178,40 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        new = HashTable(new_capacity)
+        for i in self.array:
+            while i is not None:
+                new.put(key,value)
+                i = i.next
+        self.capacity = new.capacity
+        self.array = new.array
         
 
-
+'''
 if __name__ == "__main__":
- '''   ht = HashTable(8)
+ ht = HashTable(8)
 
-    ht.put("line_1", "'Twas brillig, and the slithy toves")
-    ht.put("line_2", "Did gyre and gimble in the wabe:")
-    ht.put("line_3", "All mimsy were the borogoves,")
-    ht.put("line_4", "And the mome raths outgrabe.")
-    ht.put("line_5", '"Beware the Jabberwock, my son!')
-    ht.put("line_6", "The jaws that bite, the claws that catch!")
-    ht.put("line_7", "Beware the Jubjub bird, and shun")
-    ht.put("line_8", 'The frumious Bandersnatch!"')
-    ht.put("line_9", "He took his vorpal sword in hand;")
-    ht.put("line_10", "Long time the manxome foe he sought--")
-    ht.put("line_11", "So rested he by the Tumtum tree")
-    ht.put("line_12", "And stood awhile in thought.")
-
-    print("")
+ht.put("line_1", "'Twas brillig, and the slithy toves")
+ht.put("line_2", "Did gyre and gimble in the wabe:")
+ht.put("line_3", "All mimsy were the borogoves,")
+ht.put("line_4", "And the mome raths outgrabe.")
+ht.put("line_5", '"Beware the Jabberwock, my son!')
+ht.put("line_6", "The jaws that bite, the claws that catch!")
+ht.put("line_7", "Beware the Jubjub bird, and shun")
+ht.put("line_8", 'The frumious Bandersnatch!"')
+ht.put("line_9", "He took his vorpal sword in hand;")
+ht.put("line_10", "Long time the manxome foe he sought--")
+ht.put("line_11", "So rested he by the Tumtum tree")
+ht.put("line_12", "And stood awhile in thought.")
+ht.get("line_12")
+print("")
 
     # Test storing beyond capacity
     #for i in range(1, 13):
         #print(ht.get(f"line_{i}"))
 
-    # Test resizing
+
+  # Test resizing
     old_capacity = ht.get_num_slots()
     ht.resize(ht.capacity * 2)
     new_capacity = ht.get_num_slots()
