@@ -20,3 +20,29 @@ print(mark)
 # TODO: construct 5 random sentences
 # Your code here
 
+def generate(m, n):
+    random_start = []
+    random_stop = []
+    for i in m:
+        if i[0].isupper() or (i[0] == '"' and i[1].isupper()):
+            random_start.append(i) 
+        if i[-1] == '.' or i[-1] == '?' or i[-1] == '!':
+            random_stop.append(i)
+
+    for i in range(n):
+        start_word = random.choice(random_start)
+        curr_word = start_word
+        answer = ""
+
+        while curr_word not in random_stop:
+            answer += curr_word
+            answer += " "
+            next_words = m[curr_word]
+            r_next = random.choice(next_words)
+            curr_word = r_next
+        answer += curr_word
+       
+        print(answer, end="\n")
+
+
+generate(mark, 5)
