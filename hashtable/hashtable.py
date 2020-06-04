@@ -126,7 +126,6 @@ class HashTable:
         while cur is not None and cur.key != key:
             last = cur
             cur = last.next
-            
         if cur is None:
             print("ERROR: Unable to remove key " + key)
         else:

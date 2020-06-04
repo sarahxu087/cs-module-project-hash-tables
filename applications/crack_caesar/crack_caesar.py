@@ -3,3 +3,5 @@
 
 # Your code here
 
+with open("ciphertext.txt") as f:
+    words = f.read()
